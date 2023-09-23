@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from "./icons";
+import { signIn } from "next-auth/react";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 interface IUser {
@@ -19,13 +20,20 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
     password: "",
   });
 
+  
+
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
+    const res = await signIn<"credentials">("credentials", {
+      ...inputValue,
+      redirect: false,
+    });
+
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 5000);
 
     setInputValue({ email: "", password: "" });
 
