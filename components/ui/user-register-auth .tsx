@@ -5,37 +5,58 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from "./icons";
-import { signIn } from "next-auth/react";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 interface IUser {
+  name: string;
   email: string;
   password: string;
 }
 
-export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
+export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
+  const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState<IUser>({
+    name: "",
     email: "",
     password: "",
   });
-
-  
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     setIsLoading(true);
 
-    const res = await signIn<"credentials">("credentials", {
-      ...inputValue,
-      redirect: false,
+    const request = await fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(inputValue),
     });
+
+    const response = await request.json();
+
+    console.log("USER REGISTER FORM", response);
+
+    if (!request.ok) {
+      toast({
+        title: "Ooooops...",
+        description: response.error,
+        variant: "destructive",
+        action: (
+          <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
+        ),
+      });
+    }
 
     // setTimeout(() => {
     //   setIsLoading(false);
     // }, 5000);
 
-    setInputValue({ email: "", password: "" });
+    setInputValue({ name: "", email: "", password: "" });
 
     setIsLoading(false);
   }
@@ -55,19 +76,33 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
         <div className="grid gap-2">
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="email">
+              Name
+            </Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="nome"
+              disabled={isLoading}
+              name="name"
+              value={inputValue.name}
+              onChange={(event) => handleChange(event)}
+            />
+          </div>
+          <div className="grid gap-1">
+            <Label className="sr-only" htmlFor="email">
               Email
             </Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@exaple.com"
+              placeholder="nome@example.com"
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
               name="email"
               value={inputValue.email}
-              onChange={() => handleChange}
+              onChange={(event) => handleChange(event)}
             />
           </div>
           <div className="grid gap-1">
@@ -83,14 +118,14 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
               disabled={isLoading}
               name="password"
               value={inputValue.password}
-              onChange={() => handleChange}
+              onChange={(event) => handleChange(event)}
             />
           </div>
           <Button disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Entrar
+            Registrar
           </Button>
         </div>
       </form>
