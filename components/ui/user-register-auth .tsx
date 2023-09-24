@@ -29,7 +29,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
     event.preventDefault();
     setIsLoading(true);
 
-    const request = await fetch("/login", {
+    const request = await fetch("/api/users", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -50,6 +50,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
           <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
         ),
       });
+    } else {
     }
 
     // setTimeout(() => {
