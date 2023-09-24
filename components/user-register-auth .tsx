@@ -1,12 +1,13 @@
 "use client";
+import { Icons } from "./icons";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Icons } from "./icons";
-import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 interface IUser {
@@ -16,6 +17,7 @@ interface IUser {
 }
 
 export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
+  const router = useRouter();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +53,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
         ),
       });
     } else {
+      router.push("/login");
     }
 
     // setTimeout(() => {

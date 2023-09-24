@@ -1,11 +1,14 @@
 "use client";
 import { cn } from "@/lib/utils";
+import { Icons } from "./icons";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Icons } from "./icons";
-import { signIn } from "next-auth/react";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 interface IUser {
@@ -14,13 +17,14 @@ interface IUser {
 }
 
 export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState<IUser>({
     email: "",
     password: "",
   });
-
-  
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
@@ -30,6 +34,19 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
       ...inputValue,
       redirect: false,
     });
+
+    if (!res?.ok) {
+      toast({
+        title: "Ooops...",
+        description: res?.error,
+        variant: "destructive",
+        action: (
+          <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
+        ),
+      });
+    } else {
+      router.push("/");
+    }
 
     // setTimeout(() => {
     //   setIsLoading(false);
@@ -67,7 +84,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
               disabled={isLoading}
               name="email"
               value={inputValue.email}
-              onChange={() => handleChange}
+              onChange={(event) => handleChange(event)}
             />
           </div>
           <div className="grid gap-1">
@@ -83,7 +100,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
               disabled={isLoading}
               name="password"
               value={inputValue.password}
-              onChange={() => handleChange}
+              onChange={(event) => handleChange(event)}
             />
           </div>
           <Button disabled={isLoading}>
